@@ -1,3 +1,18 @@
+const FRIDAY = 5;
+const MILLISECONDS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const HOURS_PER_DAY = 24;
+const DAYS_PER_WEEK = 7;
+const WEEKENDS_PER_WEEK = 2;
+const WEEKS_PER_MONTH = 4;
+const MILLISECONDS2DAYS =
+  MILLISECONDS_PER_SECOND *
+  SECONDS_PER_MINUTE *
+  MINUTES_PER_HOUR *
+  HOURS_PER_DAY;
+const WEEKENDS = ['Sat', 'Sun'];
+
 /** ********************************************************************************************
  *                                                                                             *
  * Please read the following tutorial before implementing tasks:                               *
@@ -64,10 +79,10 @@ function getDayName(date) {
  * Date('2024-02-16T00:00:00Z') => Date('2024-02-23T00:00:00Z')
  */
 function getNextFriday(date) {
-  const FRIDAYN = 5;
-  const WEEKN = 7;
   date.setDate(date.getDate() + 1);
-  date.setDate(date.getDate() + ((WEEKN + FRIDAYN - date.getDay()) % WEEKN));
+  date.setDate(
+    date.getDate() + ((DAYS_PER_WEEK + FRIDAY - date.getDay()) % DAYS_PER_WEEK)
+  );
   return date;
 }
 
@@ -98,11 +113,6 @@ function getCountDaysInMonth(month, year) {
  * '2024-02-01T00:00:00.000Z', '2024-02-12T00:00:00.000Z'  => 12
  */
 function getCountDaysOnPeriod(dateStart, dateEnd) {
-  const MILLISECONDS = 1000;
-  const SECONDS = 60;
-  const MINUTES = 60;
-  const HOURS = 24;
-  const MILLISECONDS2DAYS = MILLISECONDS * SECONDS * MINUTES * HOURS;
   const diffMs = new Date(dateEnd).getTime() - new Date(dateStart).getTime();
   return Math.ceil(diffMs / MILLISECONDS2DAYS) + 1;
 }
@@ -171,21 +181,16 @@ function formatDate(date) {
  */
 function getCountWeekendsInMonth(month, year) {
   function isWeekend(date) {
-    const WEEKENDS = ['Sat', 'Sun'];
-
     return WEEKENDS.includes(
       new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)
     );
   }
 
-  const DAYS = 7;
-  const WEEKS = 4;
-  const WEEKENDS = 2;
   const start = new Date(year, month - 1);
   const end = new Date(year, month, 0);
-  const res = WEEKS * WEEKENDS;
+  const res = WEEKS_PER_MONTH * WEEKENDS_PER_WEEK;
 
-  start.setDate(start.getDate() + WEEKS * DAYS);
+  start.setDate(start.getDate() + WEEKS_PER_MONTH * DAYS_PER_WEEK);
   const endT = end.getTime();
   let add = 0;
   while (start.getTime() <= endT && add <= 2) {
@@ -212,25 +217,18 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 1, 23) => 8
  */
 function getWeekNumberByDate(date) {
-  const DAYS = 7;
-
   function getCountDays(dateStart, dateEnd) {
-    const MILLISECONDS = 1000;
-    const SECONDS = 60;
-    const MINUTES = 60;
-    const HOURS = 24;
-    const MILLISECONDS2DAYS = MILLISECONDS * SECONDS * MINUTES * HOURS;
     const diffMs = dateEnd.getTime() - dateStart.getTime();
     return Math.ceil(diffMs / MILLISECONDS2DAYS) + 1;
   }
 
   function getDayMondayFirst(d) {
-    return (d.getDay() + DAYS - 1) % DAYS;
+    return (d.getDay() + DAYS_PER_WEEK - 1) % DAYS_PER_WEEK;
   }
 
   const start = new Date(date.getFullYear(), 0);
   const days = getCountDays(start, date) - 1;
-  const weeks = Math.floor(days / DAYS) + 1;
+  const weeks = Math.floor(days / DAYS_PER_WEEK) + 1;
   if (getDayMondayFirst(date) < getDayMondayFirst(start)) {
     return weeks + 1;
   }
@@ -248,8 +246,17 @@ function getWeekNumberByDate(date) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  const MAGIC_DAY = 13;
+  const curD = new Date(
+    date.getFullYear(),
+    date.getMonth() + (date.getDate() >= MAGIC_DAY ? 1 : 0),
+    MAGIC_DAY
+  );
+  while (curD.getDay() !== FRIDAY) {
+    curD.setMonth(curD.getMonth() + 1);
+  }
+  return curD;
 }
 
 /**
