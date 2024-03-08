@@ -83,9 +83,7 @@ function getNextFriday(date) {
  * 2, 2024 => 29
  */
 function getCountDaysInMonth(month, year) {
-  const d = new Date(year, month);
-  d.setDate(d.getDate() - 1);
-  return d.getDate();
+  return new Date(year, month, 0).getDate();
 }
 
 /**
@@ -171,8 +169,33 @@ function formatDate(date) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  function isWeekend(date) {
+    const WEEKENDS = ['Sat', 'Sun'];
+
+    return WEEKENDS.includes(
+      new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)
+    );
+  }
+
+  const DAYS = 7;
+  const WEEKS = 4;
+  const WEEKENDS = 2;
+  const start = new Date(year, month - 1);
+  const end = new Date(year, month, 0);
+  const res = WEEKS * WEEKENDS;
+
+  start.setDate(start.getDate() + WEEKS * DAYS);
+  const endT = end.getTime();
+  let add = 0;
+  while (start.getTime() <= endT && add <= 2) {
+    if (isWeekend(start)) {
+      add += 1;
+    }
+    start.setDate(start.getDate() + 1);
+  }
+
+  return res + add;
 }
 
 /**
