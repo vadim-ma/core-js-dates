@@ -293,8 +293,42 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  function specialFormatDate(date) {
+    const y = date.getFullYear().toString();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${d}-${m}-${y}`;
+  }
+
+  function dateFromSpecialString(s) {
+    const DAY_POSITION = 0;
+    const DAY_LEN = 2;
+    const MONTH_POSITION = 3;
+    const MONTH_LEN = 2;
+    const YEAR_POSITION = 6;
+    const YEAR_LEN = 4;
+    const y = s.slice(YEAR_POSITION, YEAR_POSITION + YEAR_LEN);
+    const m = s.slice(MONTH_POSITION, MONTH_POSITION + MONTH_LEN);
+    const d = s.slice(DAY_POSITION, DAY_POSITION + DAY_LEN);
+    return new Date(+y, +m - 1, +d);
+  }
+  const { start: startS, end: endS } = period;
+  const start = dateFromSpecialString(startS);
+  const end = dateFromSpecialString(endS);
+  const endT = end.getTime();
+  const res = [];
+  let workDays = 0;
+  while (start.getTime() <= endT) {
+    res.push(specialFormatDate(start));
+    workDays += 1;
+    start.setDate(start.getDate() + 1);
+    if (workDays >= countWorkDays) {
+      start.setDate(start.getDate() + countOffDays);
+      workDays = 0;
+    }
+  }
+  return res;
 }
 
 /**
