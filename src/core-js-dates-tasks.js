@@ -32,7 +32,8 @@ function dateToTimestamp(date) {
  * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
  */
 function getTime(date) {
-  return new Date(date).toTimeString().slice(0, 8);
+  const len = 'hh:mm:ss'.length;
+  return new Date(date).toTimeString().slice(0, len);
 }
 
 /**
@@ -63,8 +64,10 @@ function getDayName(date) {
  * Date('2024-02-16T00:00:00Z') => Date('2024-02-23T00:00:00Z')
  */
 function getNextFriday(date) {
+  const FRIDAYN = 5;
+  const WEEKN = 7;
   date.setDate(date.getDate() + 1);
-  date.setDate(date.getDate() + ((7 + 5 - date.getDay()) % 7));
+  date.setDate(date.getDate() + ((WEEKN + FRIDAYN - date.getDay()) % WEEKN));
   return date;
 }
 
@@ -96,8 +99,14 @@ function getCountDaysInMonth(month, year) {
  * '2024-02-01T00:00:00.000Z', '2024-02-02T00:00:00.000Z'  => 2
  * '2024-02-01T00:00:00.000Z', '2024-02-12T00:00:00.000Z'  => 12
  */
-function getCountDaysOnPeriod(/* dateStart, dateEnd */) {
-  throw new Error('Not implemented');
+function getCountDaysOnPeriod(dateStart, dateEnd) {
+  const MILLISECONDS = 1000;
+  const SECONDS = 60;
+  const MINUTES = 60;
+  const HOURS = 24;
+  const MILLISECONDS2DAYS = MILLISECONDS * SECONDS * MINUTES * HOURS;
+  const diffMs = new Date(dateEnd).getTime() - new Date(dateStart).getTime();
+  return Math.ceil(diffMs / MILLISECONDS2DAYS) + 1;
 }
 
 /**
